@@ -46,7 +46,8 @@ int main(){
 }
 
 void invertirVector(int *v, int len){
-	printf("Yes");
+	printf("\nYes");
+	int i = 0;
 	__asm{
 		mov ECX, 0
 		mov EBX, len
@@ -78,16 +79,19 @@ void invertirVector(int *v, int len){
 				call reversarInt
 				add ESP, 4 ; Liberar parámetro v[i] 
 				mov [EDX + ESI*4], EAX ;  v[i] = reversarInt(v[i])
+				mov i, EAX
 				inc ESI
 				jmp forInvertirInts
 		finInvertirInts:
 	}
-	printf("No");
+	printf("\n%d", i);
+	printf("\nNo");
 }
  
 
 int reversarInt(int n){
-	printf("Me llamaron");
+	printf("\nMe llamaron");
+	int i = 0;
     __asm{
 		push EBX
 		push EDX
@@ -110,9 +114,11 @@ int reversarInt(int n){
                 shr EBX, 1 ; se hace un corrimiento hacia la derecha de EBX
                 jmp Ciclofor ; se repite el ciclo
         finCiclo:
+		mov i, EAX
 		pop ECX
 		pop EDX
 		pop EBX
     }
-	printf("Termine");
+	printf("\n%d", i);
+	printf("\nTermine");
 }

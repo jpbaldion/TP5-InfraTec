@@ -61,7 +61,19 @@ void invertirVector(int *v, int len){
 				inc ECX
 				jmp forInvertirVector
 		finInvertirVector:
-
+		
+		mov ECX, 0
+		mov EBX, len
+		forInvertirInts:
+			cmp ECX, EBX
+			jge finInvertirInts
+				push [EDX + ECX*4] ; v[i]
+				call reversarInt
+				add ESP, 4 ; Liberar parámetro v[i]
+				mov [EDX + ECX*4], EAX ; v[i] = reversarInt(v[i])
+				inc ECX
+				jmp forInvertirInts
+		finInvertirInts:
 	}
 }
  

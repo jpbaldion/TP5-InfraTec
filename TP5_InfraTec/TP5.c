@@ -39,7 +39,6 @@ int main(){
 }
 
 void invertirVector(int *v, int len){
-	int aux;
 	printf("Yes");
 	__asm{
 		mov ECX, 0
@@ -49,19 +48,16 @@ void invertirVector(int *v, int len){
 		forInvertirVector:
 			cmp ECX, EBX
 			jge finInvertirVector
-			
-				mov EDI, [EDX + ECX*4]
-				mov aux, EDI	
-				
+				mov EDI, [EDX + ECX*4] ; EDI = aux = v[i]
+
 				mov EAX, len
 				sub EAX, ECX
-				sub EAX, 1; EAX es igual a length-i-1
+				sub EAX, 1
 				imul EAX, 4
-				mov ESI, [EDX + EAX]
+				mov ESI, [EDX + EAX] ; ESI = v[length-i-1]
 				
-				mov EDI, aux
-				mov [ESI], EDI
-				
+				mov [EDX + ECX*4], ESI ; v[i] = v[length-i-1]
+				mov [EDX + EAX], EDI
 				inc ECX
 				jmp forInvertirVector
 		finInvertirVector:
@@ -73,6 +69,9 @@ void invertirVector(int *v, int len){
 int reversarInt(int n){
 	printf("Me llamaron");
     __asm{
+		push EBP
+		mov EBP, ESP
+	
 		push EBX
 		push EDX
 		push ECX
@@ -97,7 +96,7 @@ int reversarInt(int n){
 		pop ECX
 		pop EDX
 		pop EBX
-		
-		
+		pop EBP
+		ret
     }
 }

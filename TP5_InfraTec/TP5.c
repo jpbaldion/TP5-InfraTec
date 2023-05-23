@@ -4,6 +4,14 @@
 //CODIGO: 202214765
 //CORREO: j.baldion@uniandes.edu.co
 
+//NOMBRE: Wilmer Manuel Arévalo González
+//CODIGO: 202214720
+//CORREO: w.arevalo@uniandes.edu.co
+
+//NOMBRE: Sara Sofía Cárdenas Rodríguez
+//CODIGO: 202214907
+//CORREO: ss.cardenas@uniandes.edu.co
+
 void invertirVector(int *v, int length);
 int reversarInt(int n);
 
@@ -14,7 +22,7 @@ int main(){
 	
 	while(correcto){
 		// Se pide el tamaño del vector
-		printf("Ingrese el tamano del vector que deseas reversar:\n");
+		printf("Ingrese el tamanio del vector que deseas reversar:\n");
 		scanf("%i", &length);
 		
 		if(length > 0){
@@ -30,10 +38,9 @@ int main(){
 			invertirVector(vector, length);
 			// Se imprime el vector invertido
 			for (int i = 0; i < length; i++){
-				printf("%#X ", vector[i]);
+				printf(" 0x%0*X", 8, vector[i]);
 			}
 		}
-	
 	}
 	
 }
@@ -61,7 +68,7 @@ void invertirVector(int *v, int len){
 				inc ECX
 				jmp forInvertirVector
 		finInvertirVector:
-		
+
 		mov ECX, 0
 		mov EBX, len
 		forInvertirInts:

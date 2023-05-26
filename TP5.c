@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
 
 //NOMBRE: Juan Pablo Baldion Castillo
 //CODIGO: 202214765
@@ -12,113 +14,91 @@
 //CODIGO: 202214907
 //CORREO: ss.cardenas@uniandes.edu.co
 
-void invertirVector(int *v, int length);
-int reversarInt(int n);
+void invertirVector(int *vector, int n);
+int reversarInt(int num);
 
-int main(){
-	int length;
-	int *vector;
-	int correcto = 1;
-	
-	while(correcto){
-		// Se pide el tamaño del vector
-		printf("Ingrese el tamanio del vector que deseas reversar:\n");
-		scanf("%i", &length);
-		
-		if(length > 0){
-			correcto = 0;
-			//Se crea el vector mediante reserva dinamica de memoria 
-			vector = (int*) calloc(length, 4);
-			//Se pregunta cada elemento del vector
-			for (int i = 0; i < length; i++){
-				printf("Ingrese elemento #%i del vector: ", i+1);
-				scanf("%i", &vector[i]);
-			}
-			
-			invertirVector(vector, length);
-			// Se imprime el vector invertido
-			for (int i = 0; i < length; i++){
-				printf(" 0x%0*X", 8, vector[i]);
-			}
-		}
-	}
-	
-}
+int main() {
+    int n;
 
-void invertirVector(int *v, int len){
-	printf("\nYes");
-	int i = 0;
-	__asm{
-		mov ECX, 0
-		mov EBX, len
-		sar EBX, 1; ebx es igual a length/2
-		mov EDX, v
-		forInvertirVector:
-			cmp ECX, EBX
-			jge finInvertirVector
-				mov EDI, [EDX + ECX*4] ; EDI = aux = v[i]
+    printf("Ingrese el tamanio del vector a reversar: ");
+    scanf("%d", &n);
 
-				mov EAX, len
-				sub EAX, ECX
-				sub EAX, 1
-				imul EAX, 4
-				mov ESI, [EDX + EAX] ; ESI = v[length-i-1]
-				
-				mov [EDX + ECX*4], ESI ; v[i] = v[length-i-1]
-				mov [EDX + EAX], EDI
-				inc ECX
-				jmp forInvertirVector
-		finInvertirVector:
-
-		mov ESI, 0
-		mov EBX, len
-		forInvertirInts:
-			cmp ESI, EBX
-			jge finInvertirInts
-				push [EDX + ESI*4] ; v[i]
-				call reversarInt
-				add ESP, 4 ; Liberar parámetro v[i] 
-				mov [EDX + ESI*4], EAX ;  v[i] = reversarInt(v[i])
-				mov i, EAX
-				inc ESI
-				jmp forInvertirInts
-		finInvertirInts:
-	}
-	printf("\n%d", i);
-	printf("\nNo");
-}
- 
-
-int reversarInt(int n){
-	printf("\nMe llamaron");
-	int i = 0;
-    __asm{
-		push EBX
-		push EDX
-		push ECX
-        mov EAX, 0 ; se incializa el registro EAX (registro de retorno por defecto en esta arquitectura) en 0 que representa el numero reversado que se va a costruyendo
-        mov EBX, [EBP + 8] ; se mueve el parametro n al registro EBX
-        
-        mov ECX, 0 ; se inicializa ECX en 0 que representa el indice que me indica cuando parar el ciclo
-        
-		Ciclofor:
-            cmp ECX, 32
-            jge finCiclo ; si ECX es mayor o igual que 32 (numeros de bits de un int) para el ciclo
-            inc ECX ; incrementamos en uno nuestro indice ECX
-            shl EAX, 1 ; hacemmos un corrimiento hacia la izquierda de EAX
-			mov EDX, EBX ;copiamos EBX en EDX para que en la siguiente linea del and no modifique EBX
-            and EDX, 1 ; comprobamos si el bit menos significativo de EBX es uno o no
-            jz salto
-                or EAX, 1 ; si el bit menos significativo de EBX es uno cambiamos el bits menos significativo de EAX a uno
-            salto:
-                shr EBX, 1 ; se hace un corrimiento hacia la derecha de EBX
-                jmp Ciclofor ; se repite el ciclo
-        finCiclo:
-		mov i, EAX
-		pop ECX
-		pop EDX
-		pop EBX
+    // Validar que n > 0
+    while (n <= 0) {
+        printf("El tamaño del vector debe ser mayor que 0. Ingrese nuevamente: ");
+        scanf("%d", &n);
     }
-	printf("\n%d", i);
-	printf("\nTermine");
+
+    // Reservar memoria para el vector
+    int *vector = (int*) calloc(n, sizeof(int));
+
+    // Pedir los valores de cada elemento
+    printf("Ingrese los valores del vector:\n");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &vector[i]);
+    }
+
+    // Invertir el vector
+    invertirVector(vector, n);
+
+    // Imprimir el vector en hexadecimal en orden inverso
+    printf("El vector invertido en hexadecimal es:\n");
+    for (int i = n - 1; i >= 0; i--) {
+        printf("0x%X ", vector[i]);
+    }
+    printf("\n");
+
+    // Liberar memoria del vector
+    free(vector);
+
+    return 0;
+}
+
+void invertirVector(int *vector, int n) {
+    __asm{
+		push ebx
+		push esi
+		push edi
+
+		mov edi, [ebp+8]    			//; vector
+		mov esi, [ebp+12]   			//; n
+		mov ebx, 0						//; i = 0
+
+		loop_start:
+			cmp ebx, esi       			//; i < n
+			jge loop_end      		 	//; Salta al final si i >= n
+
+			mov edx, [edi + ebx * 4]   //; vector[i]
+			push edx                   //; Guarda vector[i] en la pila como parametro
+			call reversarInt           //; Llama a la función reversarInt
+			add esp, 4                 //; Ajusta el puntero de la pila después de la llamada
+
+			mov [edi + ebx * 4], eax   //; vector[i] = reversarInt(vector[i])
+
+			add ebx, 1					//; Incrementa i
+			jmp loop_start             	//; Salta al inicio del bucle
+
+		loop_end:
+		pop edi
+		pop esi
+		pop ebx
+	}
+}
+
+int reversarInt(int num) {
+    __asm {
+        mov eax, num // Se mueve el valor del argumento num al registro eax
+        mov ecx, 0 // Se mueve el valor 0 al registro ecx que se usa como contador
+        mov ebx, 0 // Se inicializa el registro ebx en cero, este será el registro que contendrá el número invertido
+		loop_start: // Etiqueta para el loop
+            cmp ecx, 32		// Se compara ecx con 32, porque un entero ocupa 32 bits
+            jge loop_end	// Si ecx>=32 sale del ciclo
+            shr eax, 1 // Se desplaza hacia la derecha el contenido de eax, eliminando el bit menos significativo
+            rcl ebx, 1 // Se rota el contenido de ebx hacia la izquierda, el bit más significativo se convierte en el menos significativo
+            inc ecx		// Se incrementa ecx
+            jmp loop_start
+        loop_end:
+		mov num, ebx // Se mueve el contenido del registro ebx al argumento num
+		mov eax, num	//Se mueve num a eax para retornarlo
+    }
 }
